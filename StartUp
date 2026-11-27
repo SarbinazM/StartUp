@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PulseForge — StartUp MVP</title>
+  <style>
+    :root {
+      --bg: #080a0f;
+      --surface: #0f131c;
+      --card: #151b28;
+      --card-hover: #1b2233;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(129, 140, 248, 0.45);
+      --text: #f3f6fc;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-2: #06b6d4;
+      --success: #10b981;
+      --radius: 18px;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    [data-theme="light"] {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --card: #ffffff;
+      --card-hover: #f8fafc;
+      --border: rgba(15, 23, 42, 0.1);
+      --border-strong: rgba(79, 70, 229, 0.45);
+      --text: #0f172a;
+      --muted: #475569;
+      --shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .glow-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background:
+        radial-gradient(600px circle at 15% 10%, rgba(99, 102, 241, 0.16), transparent 60%),
+        radial-gradient(520px circle at 85% 15%, rgba(6, 182, 212, 0.13), transparent 60%);
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.95rem;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.62rem 1.1rem;
+      border-radius: 11px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--border-strong);
+      background: var(--card-hover);
+    }
+
+    .hero {
+      padding: 4.5rem 0 3rem;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.14);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: #a5b4fc;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 1.3rem;
+    }
+
+    [data-theme="light"] .badge {
+      color: #4338ca;
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .dot-live {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    h1 {
+      font-size: clamp(2.1rem, 5vw, 3.6rem);
+      font-weight: 850;
+      line-height: 1.12;
+      letter-spacing: -0.035em;
+      max-width: 18ch;
+      margin: 0 auto 1.1rem;
+    }
+
+    .grad {
+      background: linear-gradient(90deg, #818cf8, #22d3ee, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 62ch;
+      margin: 0 auto 2rem;
+      font-size: 1.05rem;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin: 3rem 0;
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      text-align: left;
+    }
+
+    .metric-val {
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-lbl {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 0.2rem;
+    }
+
+    section {
+      padding: 3.5rem 0;
+    }
+
+    .sec-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .sec-head h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    .sec-head p {
+      color: var(--muted);
+      max-width: 48ch;
+      font-size: 0.95rem;
+    }
+
+    .tabs {
+      display: inline-flex;
+      gap: 0.4rem;
+      padding: 0.35rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 0.5rem 0.95rem;
+      border-radius: 9px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .showcase-box {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 1.25rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .code-panel {
+      background: #090c12;
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 13px;
+      padding: 1.1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.84rem;
+      line-height: 1.55;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .panel-info h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .panel-info p {
+      color: var(--muted);
+      font-size: 0.93rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      font-size: 0.9rem;
+    }
+
+    .feature-list li::before {
+      content: "✓ ";
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.15rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-strong);
+      background: var(--card-hover);
+    }
+
+    .icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: rgba(99, 102, 241, 0.14);
+      color: #818cf8;
+      font-weight: 800;
+      margin-bottom: 0.9rem;
+    }
+
+    .card h3 {
+      font-size: 1.08rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .split-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .calc-row {
+      margin: 1rem 0 1.25rem;
+    }
+
+    .calc-row label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .roi-result {
+      padding: 1rem;
+      border-radius: 13px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .roi-big {
+      font-size: 1.5rem;
+      font-weight: 850;
+      color: var(--success);
+    }
+
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 0.8rem;
+    }
+
+    input[type="email"],
+    input[type="text"] {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    input[type="email"]:focus,
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    .status-msg {
+      font-size: 0.86rem;
+      color: var(--success);
+      min-height: 1.2rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 900px) {
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .showcase-box,
+      .grid-3,
+      .split-box {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-bg"></div>
+
+  <header>
+    <div class="container nav">
+      <a href="#" class="brand">
+        <span class="brand-mark">P</span>
+        <span>PulseForge</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#product">Mahsulot</a>
+        <a href="#pillars">Afzalliklar</a>
+        <a href="#roadmap">Yo‘l xaritasi</a>
+        <a href="#early-access">Erta kirish</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button id="themeBtn" class="btn btn-ghost" aria-label="Tema">🌓</button>
+        <a href="#early-access" class="btn btn-primary">Demo so‘rash</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="badge">
+        <span class="dot-live"></span>
+        <span>Seed MVP • Tezkor ish jarayonlari va avtomatlashtirish</span>
+      </div>
+      <h1>Jamoalar uchun <span class="grad">tez va aniq</span> ish muhiti</h1>
+      <p>
+        PulseForge — vazifalarni ustuvorlik bo‘yicha navbatlash, jarayonlarni avtomatlashtirish
+        va jamoa samaradorligini real vaqtda o‘lchashga mo‘ljallangan zamonaviy platforma.
+      </p>
+      <div class="hero-cta">
+        <a href="#early-access" class="btn btn-primary">Ro‘yxatdan o‘tish</a>
+        <a href="#product" class="btn btn-ghost">Arxitekturani ko‘rish</a>
+      </div>
+
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="metric-val">3.4x</div>
+          <div class="metric-lbl">Vazifalarni yopish tezligi</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">99.95%</div>
+          <div class="metric-lbl">Servis barqarorligi (SLA)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">&lt; 45ms</div>
+          <div class="metric-lbl">API o‘rtacha javob vaqti</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">0 config</div>
+          <div class="metric-lbl">Bir necha daqiqada ishga tushirish</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="product">
+      <div class="sec-head">
+        <div>
+          <h2>Interaktiv mahsulot ko‘rinishi</h2>
+          <p>Platformaning asosiy modullarini tanlab, ishlash tamoyili bilan tanishing.</p>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="queue">Priority Queue</button>
+        <button class="tab-btn" data-tab="webhooks">Event Pipelines</button>
+        <button class="tab-btn" data-tab="sdk">REST & SDK</button>
+      </div>
+
+      <div class="showcase-box">
+        <div class="code-panel" id="codeView"></div>
+        <div class="panel-info" id="infoView"></div>
+      </div>
+    </section>
+
+    <section id="pillars">
+      <div class="sec-head">
+        <div>
+          <h2>Nima uchun PulseForge?</h2>
+          <p>Ortiqcha murakkabliksiz, faqat natija beradigan arxitektura.</p>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="icon-box">01</div>
+          <h3>Ustuvorlikka asoslangan ijro</h3>
+          <p>Muhim vazifalar navbat boshida bajariladi, takroriy urinishlar va timeout’lar avtomatik boshqariladi.</p>
+        </div>
+        <div class="card">
+          <div class="icon-box">02</div>
+          <h3>Shaffof holat nazorati</h3>
+          <p>Har bir vazifaning holati, bajarilish vaqti va xatolik sabablari aniq qayd etiladi.</p>
+        </div>
+        <div class="card">
+          <div class="icon-box">03</div>
+          <h3>Moslashuvchan integratsiya</h3>
+          <p>Web, mobil va backend servislar bilan oson ulanadigan sodda va barqaror interfeys.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="roadmap">
+      <div class="sec-head">
+        <div>
+          <h2>Yo‘l xaritasi (Roadmap)</h2>
+          <p>Loyihaning bosqichma-bosqich rivojlanish rejasi.</p>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="badge" style="margin-bottom:0.6rem;">Bosqich 1 • Tayyor</div>
+          <h3>Core Engine & UI</h3>
+          <p>Asosiy interfeys, vazifalar oqimi, ustuvorlik tizimi va lokal/prototip modullar.</p>
+        </div>
+        <div class="card">
+          <div class="badge" style="margin-bottom:0.6rem;">Bosqich 2 • Jarayonda</div>
+          <h3>Cloud Sync & Auth</h3>
+          <p>Markazlashgan baza, foydalanuvchi rollari, API kalitlari va real vaqt yangilanishlar.</p>
+        </div>
+        <div class="card">
+          <div class="badge" style="margin-bottom:0.6rem;">Bosqich 3 • Rejada</div>
+          <h3>Analytics & Automations</h3>
+          <p>Samaradorlik hisobotlari, shablonlar bozori va tashqi webhook avtomatizatsiyalari.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="early-access">
+      <div class="split-box">
+        <div class="card">
+          <h3>Tejamkorlik kalkulyatori</h3>
+          <p>Jamoangiz hajmiga qarab taxminiy tejaladigan soatlarni hisoblang.</p>
+
+          <div class="calc-row">
+            <label>
+              <span>Jamoa a’zolari soni</span>
+              <span id="teamVal">12</span>
+            </label>
+            <input type="range" id="teamRange" min="2" max="100" value="12" />
+          </div>
+
+          <div class="calc-row">
+            <label>
+              <span>Haftalik qo‘lda bajariladigan vazifalar</span>
+              <span id="tasksVal">80</span>
+            </label>
+            <input type="range" id="tasksRange" min="10" max="500" value="80" />
+          </div>
+
+          <div class="roi-result">
+            <div>
+              <div style="font-size:0.82rem; color:var(--muted);">Taxminiy tejamkorlik (oyiga)</div>
+              <div style="font-size:0.85rem; color:var(--muted);">Qo‘lda koordinatsiyaga ketadigan vaqt</div>
+            </div>
+            <div class="roi-big" id="hoursSaved">~42 soat</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Erta kirish (Early Access)</h3>
+          <p>Yangi versiyalar va beta-test takliflaridan birinchilardan bo‘lib xabardor bo‘ling.</p>
+
+          <form class="form-grid" id="waitlistForm">
+            <input type="text" id="nameInput" placeholder="Ismingiz" required />
+            <input type="email" id="emailInput" placeholder="Email manzilingiz (masalan: name@domain.com)" required />
+            <button type="submit" class="btn btn-primary">Ro‘yxatga qo‘shilish</button>
+            <div class="status-msg" id="formStatus"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+      <span>© 2026 PulseForge — StartUp Repository</span>
+      <span>Built with HTML5, CSS3 & Vanilla JS</span>
+    </div>
+  </footer>
+
+  <script>
+    const MODULES = {
+      queue: {
+        title: "Priority Queue Engine",
+        desc: "Yuqori ustuvorlikdagi vazifalarni birinchi o‘rinda bajaradi va navbat tartibini saqlaydi.",
+        points: [
+          "HIGH / MEDIUM / LOW ustuvorlik darajalari",
+          "Xatolik yuz berganda xavfsiz qayta urinish (retry)",
+          "Ish jarayonini real vaqtda kuzatish"
+        ],
+        code: `// Task priority scheduling example
+const queue = [
+  { id: "task-101", title: "Payment webhook", priority: 1 },
+  { id: "task-102", title: "Weekly digest",  priority: 3 },
+  { id: "task-103", title: "Auth token sync", priority: 2 }
+].sort((a, b) => a.priority - b.priority);
+
+console.log("Next task:", queue[0].title);`
+      },
+      webhooks: {
+        title: "Event Pipelines",
+        desc: "Hodisalar yuz berganda kerakli servislarni ketma-ket va ishonchli xabardor qiladi.",
+        points: [
+          "Hodisa asosida avtomatik oqimlar",
+          "Idempotency kalitlari bilan dublikat oldini olish",
+          "Tushunarli log va status tarixi"
+        ],
+        code: `POST /api/v1/events
+{
+  "event": "project.milestone.completed",
+  "project": "StartUp MVP",
+  "timestamp": "2026-11-27T09:48:00Z"
+}`
+      },
+      sdk: {
+        title: "Clean REST & SDK",
+        desc: "Minimal so‘rovlar, aniq JSON javoblar va tez integratsiya qilinadigan endpointlar.",
+        points: [
+          "Standart HTTP status kodlari",
+          "Filtr, qidiruv va sahifalash qo‘llovi",
+          "Har qanday til bilan mos keluvchi JSON"
+        ],
+        code: `GET /api/v1/tasks?status=in_progress&limit=10
+Authorization: Bearer <YOUR_API_KEY>
+
+-> 200 OK { "items": [...], "total": 14 }`
+      }
+    };
+
+    const codeView = document.getElementById("codeView");
+    const infoView = document.getElementById("infoView");
+    const tabButtons = document.querySelectorAll(".tab-btn");
+
+    function renderTab(key) {
+      const item = MODULES[key];
+      codeView.textContent = item.code;
+      infoView.innerHTML = `
+        <h3>${item.title}</h3>
+        <p>${item.desc}</p>
+        <ul class="feature-list">
+          ${item.points.map((p) => `<li>${p}</li>`).join("")}
+        </ul>
+      `;
+    }
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderTab(btn.dataset.tab);
+      });
+    });
+
+    renderTab("queue");
+
+    const teamRange = document.getElementById("teamRange");
+    const tasksRange = document.getElementById("tasksRange");
+    const teamVal = document.getElementById("teamVal");
+    const tasksVal = document.getElementById("tasksVal");
+    const hoursSaved = document.getElementById("hoursSaved");
+
+    function updateCalculator() {
+      const members = Number(teamRange.value);
+      const weeklyTasks = Number(tasksRange.value);
+      teamVal.textContent = members;
+      tasksVal.textContent = weeklyTasks;
+      const monthlyHours = Math.max(4, Math.round((weeklyTasks * 0.12 + members * 0.4) * 4));
+      hoursSaved.textContent = `~${monthlyHours} soat`;
+    }
+
+    teamRange.addEventListener("input", updateCalculator);
+    tasksRange.addEventListener("input", updateCalculator);
+    updateCalculator();
+
+    const themeBtn = document.getElementById("themeBtn");
+    themeBtn.addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+    });
+
+    const waitlistForm = document.getElementById("waitlistForm");
+    const formStatus = document.getElementById("formStatus");
+    waitlistForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("nameInput").value.trim();
+      const email = document.getElementById("emailInput").value.trim();
+      formStatus.textContent = `Rahmat, ${name}! ${email} manzili erta kirish ro‘yxatiga qo‘shildi.`;
+      waitlistForm.reset();
+    });
+  </script>
+</body>
+</html>
